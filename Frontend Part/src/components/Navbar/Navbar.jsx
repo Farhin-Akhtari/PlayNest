@@ -268,10 +268,10 @@ const unreadCount = notifications.filter(
 
   return (
     <nav className="sticky top-0 z-50 w-full px-3 md:px-6 py-3 border-b bg-white dark:bg-gray-900 dark:border-gray-700">
-      <div className="flex items-center justify-between">
+      <div className="flex items-center gap-2 md:justify-between">
 
         {/* Logo */}
-<div className="flex items-center gap-2">
+ <div className="flex items-center gap-1 shrink-0">
   <button
     onClick={onMenuClick}
     className="md:hidden p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800"
@@ -285,7 +285,7 @@ const unreadCount = notifications.filter(
 </div>
 
         {/* Search */}
-        <div ref={searchRef} className="relative w-full max-w-[450px] mx-4 md:mx-0">
+       <div ref={searchRef} className="relative flex-1 min-w-0 max-w-[450px] mx-1 md:mx-0">
         <div className="flex items-center">
           <input
             type="text"
@@ -308,6 +308,7 @@ const unreadCount = notifications.filter(
            <FiSearch />
           </button>
         </div>
+
     {showSearchHistory && (
   <div className="absolute top-full left-0 w-full bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl shadow-lg mt-2 z-50 overflow-hidden">
 
@@ -401,7 +402,7 @@ const unreadCount = notifications.filter(
 )}
     </div>
 
-  <div className="flex items-center gap-3 md:gap-7">
+  <div className="flex items-center gap-1 md:gap-7 shrink-0">
 
   {/* Notifications */}
    <div className="relative">
