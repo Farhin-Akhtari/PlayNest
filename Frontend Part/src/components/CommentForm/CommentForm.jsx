@@ -4,7 +4,7 @@ function CommentForm({
   onComment,
 }) {
   return (
-    <div className="flex gap-3 mb-6">
+    <div className="flex flex-col sm:flex-row gap-3 mb-6 w-full">
       <input
         type="text"
         value={commentText}
@@ -15,7 +15,7 @@ function CommentForm({
 
       <button
         onClick={onComment}
-        className="px-5 py-2 bg-black text-white dark:bg-white dark:text-black rounded-full font-semibold"
+        className="px-5 py-2 bg-black text-white dark:bg-white dark:text-black rounded-full font-semibold w-full sm:w-auto"
       >
         Comment
       </button>
