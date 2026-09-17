@@ -3,7 +3,7 @@ import ProtectedRoute from "../components/ProtectedRoute/ProtectedRoute.jsx";
 import MainLayout from "../layouts/MainLayout";
 import Home from "../pages/Home";
 import VideoDetails from "../pages/VideoDetails";
-import Login from "../pages/login";
+import Login from "../pages/Login";
 import UploadVideo from "../pages/UploadVideo";
 import MyVideos from "../pages/MyVideos";
 import EditVideo from "../pages/EditVideo";
