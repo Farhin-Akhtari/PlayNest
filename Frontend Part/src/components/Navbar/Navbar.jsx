@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, useContext } from "react";
 import { useNavigate } from "react-router-dom";
-import { FiSearch, FiClock, FiX, FiBell, FiSun, FiMoon } from "react-icons/fi";
+import { FiSearch, FiClock, FiX, FiBell, FiSun, FiMoon, FiMenu } from "react-icons/fi";
 import { logoutUser } from "../../services/authService.js";
 import { getSearchHistory, addSearchHistory, deleteSearchHistory, clearSearchHistory } from "../../services/searchHistory.js";
 import {getAllVideos} from "../../services/videoService.js"
@@ -38,7 +38,7 @@ const getTimeAgo = (date) => {
   return new Date(date).toLocaleDateString();
 };
 
-function Navbar() {
+function Navbar({onMenuClick}) {
   const navigate = useNavigate();
   const searchRef = useRef(null);
 
@@ -267,16 +267,25 @@ const unreadCount = notifications.filter(
 ).length;
 
   return (
-    <nav className="sticky top-0 z-50 w-full px-6 py-3 border-b bg-white dark:bg-gray-900 dark:border-gray-700">
+    <nav className="sticky top-0 z-50 w-full px-3 md:px-6 py-3 border-b bg-white dark:bg-gray-900 dark:border-gray-700">
       <div className="flex items-center justify-between">
 
         {/* Logo */}
-        <h1 className="text-3xl font-bold text-red-600 cursor-pointer">
-          PlayNest
-        </h1>
+<div className="flex items-center gap-2">
+  <button
+    onClick={onMenuClick}
+    className="md:hidden p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800"
+  >
+    <FiMenu size={24} />
+  </button>
+
+  <h1 className="text-2xl md:text-3xl font-bold text-red-600 cursor-pointer">
+    PlayNest
+  </h1>
+</div>
 
         {/* Search */}
-        <div ref={searchRef} className="relative w-[450px]">
+        <div ref={searchRef} className="relative w-full max-w-[450px] mx-4 md:mx-0">
         <div className="flex items-center">
           <input
             type="text"
@@ -392,7 +401,7 @@ const unreadCount = notifications.filter(
 )}
     </div>
 
-  <div className="flex items-center gap-7">
+  <div className="flex items-center gap-3 md:gap-7">
 
   {/* Notifications */}
    <div className="relative">

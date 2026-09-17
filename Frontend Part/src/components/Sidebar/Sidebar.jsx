@@ -14,7 +14,7 @@ import { AiFillLike } from "react-icons/ai";
 import { FiUpload } from "react-icons/fi";
 import { FaUser } from "react-icons/fa";
 
-function Sidebar() {
+function Sidebar({ sidebarOpen, setSidebarOpen }) {
   const navigate = useNavigate();
 
   const [activeMenu, setActiveMenu] = useState("Home");
@@ -77,9 +77,10 @@ function Sidebar() {
   ];
 
   const handleNavigation = (item) => {
-    setActiveMenu(item.name);
-    navigate(item.path);
-  };
+  setActiveMenu(item.name);
+  navigate(item.path);
+  setSidebarOpen(false);
+ };
 
   const renderMenuItems = (items) => {
     return items.map((item) => (
@@ -99,7 +100,19 @@ function Sidebar() {
   };
 
   return (
-     <aside className="fixed top-16 left-0 w-64 h-[calc(100vh-64px)] bg-white dark:bg-gray-900 text-gray-900 dark:text-white border-r border-gray-200 dark:border-gray-700 p-4 overflow-y-auto">
+     <aside
+  className={`fixed top-16 left-0 w-64 h-[calc(100vh-64px)] bg-white dark:bg-gray-900 text-gray-900 dark:text-white border-r border-gray-200 dark:border-gray-700 p-4 overflow-y-auto z-40 transform transition-transform duration-300 ${
+    sidebarOpen ? "translate-x-0" : "-translate-x-full"
+  } md:translate-x-0`}
+>
+  <div className="flex justify-end md:hidden mb-2">
+   <button
+    onClick={() => setSidebarOpen(false)}
+    className="text-gray-500 dark:text-gray-400 text-xl"
+   >
+     ✕
+   </button>
+  </div>
       
       {/* Main Menu */}
       <ul className="space-y-2">

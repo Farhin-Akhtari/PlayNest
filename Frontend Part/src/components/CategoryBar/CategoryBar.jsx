@@ -12,7 +12,7 @@ const categories = [
 function CategoryBar({ selectedCategory, setSelectedCategory }) {
   return (
     <div className="sticky top-16 z-20 bg-white dark:bg-gray-950 py-2 md:py-4 mb-4 md:mb-6">
-      <div className="flex gap-3 overflow-x-auto pb-3">
+     <div className="flex gap-2 md:gap-3 overflow-x-auto pb-2 md:pb-3 scrollbar-hide">
         {categories.map((category) => (
        <button
          key={category}

@@ -311,7 +311,7 @@ function VideoDetails() {
   }
 
   return (
-    <>
+      <div className="w-full min-w-0 overflow-x-hidden">
       {/* Video Player */}
       <VideoPlayer video={video} />
 
@@ -449,7 +449,7 @@ function VideoDetails() {
           </div>
         )}
       </div>
-    </>
+    </div>
   );
 }
 
