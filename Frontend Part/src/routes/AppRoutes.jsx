@@ -4,6 +4,7 @@ import MainLayout from "../layouts/MainLayout";
 import Home from "../pages/Home";
 import VideoDetails from "../pages/VideoDetails";
 import Login from "../pages/Login";
+import Register from "../pages/Register";
 import UploadVideo from "../pages/UploadVideo";
 import MyVideos from "../pages/MyVideos";
 import EditVideo from "../pages/EditVideo";
@@ -24,6 +25,7 @@ function AppRoutes() {
       <Routes>
         
         <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Register />} />
 
         <Route element={<MainLayout />}>
           <Route path="/" element={<Home />} />

@@ -100,7 +100,19 @@ function Login() {
         >
           {loading ? "Logging in..." : "Login"}
         </button>
+
+    <p className="text-center mt-4 text-gray-600 dark:text-gray-400">
+     Don't have an account?{" "}
+    <button
+      type="button"
+      onClick={() => navigate("/register")}
+      className="text-blue-600 dark:text-blue-400 hover:underline"
+    >
+      Register
+    </button>
+  </p>
       </form>
+
     </div>
   );
 }
