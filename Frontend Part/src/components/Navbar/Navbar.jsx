@@ -71,7 +71,7 @@ function Navbar() {
       }
     };
     fetchSearchHistory();
-  }, [])
+  }, [user])
 
   useEffect(() => {
   const handleClickOutside = (event) => {
@@ -319,7 +319,7 @@ const unreadCount = notifications.filter(
               setShowSearchHistory(false);
 
               navigate(
-                `/watch/${video._id}`
+                `/videos/${video._id}`
               );
             }}
            className="flex items-center gap-3 px-4 py-3 hover:bg-gray-100 dark:hover:bg-gray-800 cursor-pointer transition"
