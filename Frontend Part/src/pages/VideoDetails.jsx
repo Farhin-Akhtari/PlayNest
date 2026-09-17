@@ -264,8 +264,6 @@ function VideoDetails() {
         videoId
       );
 
-      console.log("Video added to playlist:", response);
-
       setPlaylistMessage(
         "Video added to playlist successfully!"
       );

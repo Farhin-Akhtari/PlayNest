@@ -14,8 +14,6 @@ function ChannelSubscriptions() {
       try {
         const response = await getChannelSubscriptions(channelId);
 
-        console.log("Subscriptions:", response);
-
         setSubscriptions(response.data.subscribedChannels);
       } catch (err) {
         console.error(err);

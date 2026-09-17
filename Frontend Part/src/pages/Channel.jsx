@@ -38,9 +38,6 @@ function Channel() {
       try {
         const response = await getUserChannelProfile(username);
 
-        console.log("Channel:", response);
-        console.log(response.data);
-
         setChannel(response.data);
 
         const videoResponse = await getAllVideos("", response.data._id);

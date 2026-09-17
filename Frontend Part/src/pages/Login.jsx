@@ -30,8 +30,6 @@ function Login() {
 
       const response = await loginUser(formData);
 
-      console.log("Login response:", response);
-
       const user = response.data.user;
 
       localStorage.setItem("user", JSON.stringify(user));

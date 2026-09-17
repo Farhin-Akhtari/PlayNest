@@ -27,8 +27,6 @@ function Playlist() {
     try {
       const response = await createPlaylist(formData);
 
-      console.log("Created playlist:", response);
-
       setPlaylists((prev) => [...prev, response.data]);
 
       setFormData({
@@ -48,8 +46,6 @@ function Playlist() {
         const user = JSON.parse(localStorage.getItem("user"));
 
         const response = await getUserPlaylists(user._id);
-
-        console.log("Playlists:", response);
 
         setPlaylists(response.data);
       } catch (error) {

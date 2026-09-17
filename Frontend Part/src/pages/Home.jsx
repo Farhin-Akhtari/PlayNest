@@ -18,8 +18,6 @@ function Home() {
       try {
         const response = await getAllVideos(searchQuery);
 
-        console.log("First Videos:", response[0]);
-
         setVideos(response);
       } catch (err) {
         console.error(err);
@@ -47,8 +45,6 @@ function Home() {
       </h2>
     );
   }
-
-  console.log("videos state:", videos);
 
   const filteredVideos =
     selectedCategory === "All"

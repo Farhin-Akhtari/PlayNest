@@ -14,8 +14,6 @@ function Subscriptions() {
       try {
         const response = await getSubscribedChannels();
 
-        console.log("Subscribed channels:", response);
-
         setChannels(response.data.subscribedChannels || []);
       } catch (err) {
         console.error(err);

@@ -29,8 +29,6 @@ function PlaylistDetails() {
       try {
         const response = await getPlaylistById(playlistId);
 
-        console.log("Playlist details:", response);
-
         setPlaylist(response.data[0]);
       } catch (error) {
         console.error("Failed to fetch playlist:", error);
@@ -49,8 +47,6 @@ function PlaylistDetails() {
         playlistId,
         videoId
       );
-
-      console.log("Video removed:", response);
 
       setPlaylist((prev) => ({
         ...prev,
@@ -73,8 +69,6 @@ function PlaylistDetails() {
         editFormData
       );
 
-      console.log("Playlist updated:", response);
-
       setPlaylist((prev) => ({
         ...prev,
         name: response.data.name,
@@ -91,8 +85,6 @@ function PlaylistDetails() {
   const handleDeletePlaylist = async () => {
     try {
       const response = await deletePlaylist(playlistId);
-
-      console.log("Playlist deleted:", response);
 
       // After deletion, go back to playlists page
       navigate("/playlists");

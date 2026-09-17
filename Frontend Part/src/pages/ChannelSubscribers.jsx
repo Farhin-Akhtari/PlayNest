@@ -14,8 +14,6 @@ function ChannelSubscribers() {
       try {
         const response = await getChannelSubscribers(channelId);
 
-        console.log("Subscribers:", response);
-
         setSubscribers(response.data.subscribers);
       } catch (err) {
         console.error(err);

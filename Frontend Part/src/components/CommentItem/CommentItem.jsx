@@ -18,8 +18,6 @@ const isVideoOwner =
   video?.owner?._id?.toString() === loggedInUser?._id?.toString();
 
   const isEditing = editingCommentId === comment._id;
-  console.log("loggedInUser:", loggedInUser);
-console.log("comment owner:", comment.owner);
 
   return (
     <div className="flex gap-3">

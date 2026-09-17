@@ -33,9 +33,6 @@ function UploadVideo() {
       formData.append("thumbnail", thumbnail);
 
       const response = await publishVideo(formData);
-
-      console.log("Video published:", response);
-
        navigate("/my-videos");
 
     } catch (error) {

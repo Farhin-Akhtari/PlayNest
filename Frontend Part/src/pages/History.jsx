@@ -23,8 +23,6 @@ function History() {
       try {
         const response = await getWatchHistory();
 
-        console.log("Watch History:", response);
-
         setHistory(response.data || []);
       } catch (error) {
         console.error("Failed to fetch watch history:", error);

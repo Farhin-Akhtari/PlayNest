@@ -96,7 +96,6 @@ useEffect(() => {
 
     try {
       const response = await getAllVideos(search.trim());
-      console.log("Suggestions response:", response);
 
       setSuggestions(response || []);
     } catch (error) {
@@ -117,10 +116,8 @@ useEffect(() => {
   if(!user?._id) return;
 
   socket.on("connect", () => {
-    console.log("Connected to socket:", socket.id);
-
     socket.emit("join", user._id);
-    console.log("Joined socket room: ", user._id);
+
   });
   return () => {
     socket.off("connect");
@@ -130,8 +127,6 @@ useEffect(() => {
 //SET HANDLE AND DELETE NEW NOTIFICATION USEEFFECT
 useEffect(() => {
   const handleNewNotification = (notification) => {
-    console.log("New notification received:", notification);
-
     setNotifications((prev) => [
       notification,
       ...prev
@@ -139,7 +134,6 @@ useEffect(() => {
   };
 
   const handleNotificationDeleted = (notificationId) => {
-    console.log("Notification deleted:", notificationId);
 
     setNotifications((prev) =>
       prev.filter(

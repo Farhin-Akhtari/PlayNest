@@ -10,10 +10,8 @@ function WatchLater() {
     const fetchWatchLater = async () => {
       try {
         const response = await getWatchLater();
-
-        console.log("Watch Later:", response);
-
         setVideos(response.data);
+        
       } catch (error) {
         console.error("Failed to fetch watch later videos:", error);
       } finally {

@@ -49,8 +49,6 @@ function Register() {
 
       const response = await registerUser(data);
 
-      console.log("Register response:", response);
-
       navigate("/login");
     } catch (err) {
       console.error(err);

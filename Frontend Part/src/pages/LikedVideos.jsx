@@ -11,8 +11,6 @@ function LikedVideos() {
       try {
         const response = await getLikedVideos();
 
-        console.log("Liked Videos:", response);
-
         const likedVideos = response.data
           .map((item) => item.likedVideo)
           .filter(Boolean);
