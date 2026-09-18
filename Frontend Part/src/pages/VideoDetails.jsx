@@ -45,6 +45,9 @@ function VideoDetails() {
   const [showPlaylistMenu, setShowPlaylistMenu] = useState(false);
   const [playlistMessage, setPlaylistMessage] = useState("");
   const [playlistMessageType, setPlaylistMessageType] = useState("");
+  const [showLoginMessage, setShowLoginMessage] = useState(false);
+  const [loginMessage, setLoginMessage] = useState("");
+  const [loginMessageCommentId, setLoginMessageCommentId] = useState(null);
 
   // for login
   const loggedInUser = JSON.parse(localStorage.getItem("user"));
@@ -119,86 +122,116 @@ function VideoDetails() {
     fetchComments();
   }, [videoId]);
 
+  const showLoginRequired = (message) => {
+  setLoginMessage(message);
+  setShowLoginMessage(true);
+
+  setTimeout(() => {
+    setShowLoginMessage(false);
+  }, 3000);
+ };
+
   // ADD THE SUBSCRIBE BUTTON HANDLER HERE
-  const handleSubscribe = async () => {
-    try {
-      const response = await toggleSubscription(video.owner._id);
+const handleSubscribe = async () => {
+  if (!loggedInUser) {
+    showLoginRequired("Please log in to subscribe to this channel.");
+    return;
+  }
 
-      const isNowSubscribed = response.data.subscribed;
+  try {
+    const response = await toggleSubscription(video.owner._id);
 
-      setSubscribed(isNowSubscribed);
+    const isNowSubscribed = response.data.subscribed;
 
-      setSubscribersCount((prev) =>
-        isNowSubscribed ? prev + 1 : prev - 1
-      );
-    } catch (err) {
-      console.error("Subscription failed:", err);
-    }
-  };
+    setSubscribed(isNowSubscribed);
+
+    setSubscribersCount((prev) =>
+      isNowSubscribed ? prev + 1 : prev - 1
+    );
+  } catch (err) {
+    console.error("Subscription failed:", err);
+  }
+};
 
   // ADD LIKE BUTTON HANDLER
-  const handleLike = async () => {
-    try {
-      const response = await toggleVideoLike(videoId);
+ const handleLike = async () => {
+  if (!loggedInUser) {
+    showLoginRequired("Please log in to like this video.");
+    return;
+  }
 
-      const isNowLiked = response.data.liked;
+  try {
+    const response = await toggleVideoLike(videoId);
 
-      setLiked(isNowLiked);
+    const isNowLiked = response.data.liked;
 
-      setLikesCount((prev) =>
-        isNowLiked ? prev + 1 : prev - 1
-      );
-    } catch (err) {
-      console.error("Like failed:", err);
-    }
-  };
+    setLiked(isNowLiked);
+
+    setLikesCount((prev) =>
+      isNowLiked ? prev + 1 : prev - 1
+    );
+  } catch (err) {
+    console.error("Like failed:", err);
+  }
+};
 
   // ADD CREATE COMMENT HANDLER
   const handleComment = async () => {
-    if (!commentText.trim()) return;
+  if (!commentText.trim()) return;
 
-    try {
-      const response = await createComment(videoId, commentText);
+  if (!loggedInUser) {
+    showLoginRequired("Please log in to comment on this video.");
+    return;
+  }
 
-      setComments((prev) => [
-        {
-          ...response.data,
-          likesCount: 0,
-          isLiked: false,
-        },
-        ...prev,
-      ]);
+  try {
+    const response = await createComment(videoId, commentText);
 
-      setCommentText("");
-    } catch (err) {
-      console.error("Failed to create comment:", err);
-    }
-  };
+    setComments((prev) => [
+      {
+        ...response.data,
+        likesCount: 0,
+        isLiked: false,
+      },
+      ...prev,
+    ]);
+
+    setCommentText("");
+  } catch (err) {
+    console.error("Failed to create comment:", err);
+  }
+};
 
   // ADD COMMENT LIKE
   const handleCommentLike = async (commentId) => {
-    try {
-      const response = await toggleCommentLike(commentId);
+    if (!loggedInUser) {
+    setLoginMessageCommentId(commentId);
+    showLoginRequired("Please log in to like this comment.");
+    return;
+  }
 
-      const isNowLiked = response.data.liked;
+  try {
+    const response = await toggleCommentLike(commentId);
 
-      setComments((prevComments) =>
-        prevComments.map((comment) =>
-          comment._id === commentId
-            ? {
-                ...comment,
-                isLiked: isNowLiked,
-                likesCount: isNowLiked
-                  ? comment.likesCount + 1
-                  : comment.likesCount - 1,
-              }
-            : comment
-        )
-      );
-    } catch (err) {
-      console.error("Comment like failed:", err);
-    }
-  };
+    const isNowLiked = response.data.liked;
+
+    setComments((prevComments) =>
+      prevComments.map((comment) =>
+        comment._id === commentId
+          ? {
+              ...comment,
+              isLiked: isNowLiked,
+              likesCount: isNowLiked
+                ? comment.likesCount + 1
+                : comment.likesCount - 1,
+            }
+          : comment
+      )
+    );
+  } catch (err) {
+    console.error("Comment like failed:", err);
+  }
+};
 
   // ADD EDIT COMMENT HANDLER
   const handleEditComment = async (commentId) => {
@@ -312,6 +345,7 @@ function VideoDetails() {
 
   return (
       <div className="w-full min-w-0 overflow-x-hidden">
+
       {/* Video Player */}
       <VideoPlayer video={video} />
 
@@ -327,16 +361,24 @@ function VideoDetails() {
         />
 
         {/* Subscribe Button */}
+        <div className="relative">
         <button
-          onClick={handleSubscribe}
-          className={`px-5 py-2 rounded-full font-semibold transition ${
-            subscribed
-              ? "bg-gray-200 text-black dark:bg-gray-800 dark:text-white"
-              : "bg-black text-white dark:bg-white dark:text-black"
-          }`}
-        >
-          {subscribed ? "Subscribed" : "Subscribe"}
-        </button>
+        onClick={handleSubscribe}
+         className={`px-5 py-2 rounded-full font-semibold transition-all duration-200 active:scale-95 ${
+          subscribed
+        ? "bg-gray-200 text-black hover:bg-gray-300 dark:bg-gray-800 dark:text-white dark:hover:bg-gray-700"
+        : "bg-black text-white hover:bg-gray-800 dark:bg-white dark:text-black dark:hover:bg-gray-200"
+       }`}
+    >
+      {subscribed ? "Subscribed" : "Subscribe"}
+    </button>
+ 
+  {showLoginMessage && loginMessage.includes("subscribe") && (
+    <div className="absolute top-full right-0 mt-2 z-50 w-max max-w-xs bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 shadow-lg rounded-xl px-4 py-3 text-sm text-gray-900 dark:text-white">
+      {loginMessage}
+    </div>
+  )}
+</div>
       </div>
 
       {/* Video Actions */}
@@ -346,8 +388,9 @@ function VideoDetails() {
         onLike={handleLike}
         watchLater={watchLater}
         onWatchLater={handleWatchLater}
+        showLoginMessage={showLoginMessage}
+        loginMessage={loginMessage}
       />
-
       {/* Playlist Section */}
       <div className="relative mt-4">
         <button
@@ -407,11 +450,13 @@ function VideoDetails() {
         </h2>
 
         {/* Add Comment */}
-        <CommentForm
-          commentText={commentText}
-          setCommentText={setCommentText}
-          onComment={handleComment}
-        />
+      <CommentForm
+         commentText={commentText}
+         setCommentText={setCommentText}
+         onComment={handleComment}
+         showLoginMessage={showLoginMessage}
+         loginMessage={loginMessage}
+      />
 
         {/* Comments */}
         {commentsLoading ? (
@@ -444,6 +489,9 @@ function VideoDetails() {
                   setEditingCommentId(null);
                   setEditingText("");
                 }}
+                showLoginMessage={showLoginMessage}
+                loginMessage={loginMessage}
+                loginMessageCommentId={loginMessageCommentId}
               />
             ))}
           </div>

@@ -10,6 +10,9 @@ function CommentItem({
   setEditingText,
   onSaveEdit,
   onCancelEdit,
+  showLoginMessage,
+  loginMessage,
+  loginMessageCommentId,
 }) {
  const isCommentOwner =
   comment.owner?._id?.toString() === loggedInUser?._id?.toString();
@@ -72,18 +75,28 @@ const isVideoOwner =
               {comment.content}
             </p>
 
-            {/* Like */}
-            <button
-              onClick={() => onLike(comment._id)}
-              className={`text-sm mt-1 ${
-                comment.isLiked
-                  ? "text-red-500"
-                  : "text-gray-500 dark:text-gray-400"
-              }`}
-            >
-              {comment.isLiked ? "❤️" : "♡"}{" "}
-              {comment.likesCount}
-            </button>
+       {/* Like */}
+<div className="relative w-fit">
+  <button
+    onClick={() => onLike(comment._id)}
+    className={`text-sm mt-1 transition-all duration-200 active:scale-95 ${
+      comment.isLiked
+        ? "text-red-500"
+        : "text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200"
+    }`}
+  >
+    {comment.isLiked ? "❤️" : "♡"}{" "}
+    {comment.likesCount}
+  </button>
+
+ {showLoginMessage &&
+  loginMessage.includes("like this comment") &&
+  loginMessageCommentId === comment._id && (
+      <div className="absolute top-full left-0 mt-2 z-50 w-max max-w-xs bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 shadow-lg rounded-xl px-4 py-3 text-sm text-gray-900 dark:text-white">
+        {loginMessage}
+      </div>
+    )}
+</div>
 
             {/* Edit / Delete */}
             <div className="flex gap-3 mt-2">
