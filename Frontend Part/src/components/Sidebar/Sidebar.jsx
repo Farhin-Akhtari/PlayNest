@@ -11,7 +11,7 @@ import {
 } from "react-icons/md";
 import { SiYoutubeshorts } from "react-icons/si";
 import { AiFillLike } from "react-icons/ai";
-import { FiUpload } from "react-icons/fi";
+import { FiUpload, FiX } from "react-icons/fi";
 import { FaUser } from "react-icons/fa";
 
 function Sidebar({ sidebarOpen, setSidebarOpen }) {
@@ -100,17 +100,17 @@ function Sidebar({ sidebarOpen, setSidebarOpen }) {
   };
 
   return (
-     <aside
-  className={`fixed top-16 left-0 w-64 h-[calc(100vh-64px)] bg-white dark:bg-gray-900 text-gray-900 dark:text-white border-r border-gray-200 dark:border-gray-700 p-4 overflow-y-auto z-40 transform transition-transform duration-300 ${
-    sidebarOpen ? "translate-x-0" : "-translate-x-full"
-  } md:translate-x-0`}
->
-  <div className="flex justify-end md:hidden mb-2">
+    <aside
+     className={`fixed top-[100px] md:top-16 left-0 w-64 h-[calc(100vh-112px)] md:h-[calc(100vh-64px)] bg-white dark:bg-gray-900 text-gray-900 dark:text-white border-r border-gray-200 dark:border-gray-700 p-4 overflow-y-auto z-40 transform transition-transform duration-300 ${
+     sidebarOpen ? "translate-x-0" : "-translate-x-full"
+    } md:translate-x-0`}
+   >
+  <div className="flex justify-end md:hidden mb-3">
    <button
     onClick={() => setSidebarOpen(false)}
-    className="text-gray-500 dark:text-gray-400 text-xl"
+    className="p-2 rounded-full text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800"
    >
-     ✕
+    <FiX size={24} />
    </button>
   </div>
       

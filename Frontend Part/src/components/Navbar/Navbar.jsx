@@ -268,7 +268,7 @@ const unreadCount = notifications.filter(
 
   return (
     <nav className="sticky top-0 z-50 w-full px-3 md:px-6 py-3 border-b bg-white dark:bg-gray-900 dark:border-gray-700">
-      <div className="flex items-center gap-2 md:justify-between">
+      <div className="flex flex-wrap items-center gap-2 md:justify-between">
 
         {/* Logo */}
  <div className="flex items-center gap-1 shrink-0">
@@ -285,7 +285,10 @@ const unreadCount = notifications.filter(
 </div>
 
         {/* Search */}
-       <div ref={searchRef} className="relative flex-1 min-w-0 max-w-[450px] mx-1 md:mx-0">
+       <div
+  ref={searchRef}
+  className="relative order-3 w-full max-w-none md:order-none md:flex-1 md:min-w-0 md:max-w-[450px] mx-0 md:mx-0"
+>
         <div className="flex items-center">
           <input
             type="text"
