@@ -2,6 +2,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import ProtectedRoute from "../components/ProtectedRoute/ProtectedRoute.jsx";
 import MainLayout from "../layouts/MainLayout";
 import Home from "../pages/Home";
+import Shorts from "../pages/Shorts";
 import VideoDetails from "../pages/VideoDetails";
 import Login from "../pages/Login";
 import Register from "../pages/Register";
@@ -29,6 +30,7 @@ function AppRoutes() {
 
         <Route element={<MainLayout />}>
           <Route path="/" element={<Home />} />
+          <Route path="/shorts" element={<Shorts />} />
           <Route path="/videos/:videoId" element={<VideoDetails/>} />
           <Route path="/notifications" element={<ProtectedRoute> <Notifications/> </ProtectedRoute>} />
           <Route path="/upload" element={ <ProtectedRoute> <UploadVideo/> </ProtectedRoute>} />
