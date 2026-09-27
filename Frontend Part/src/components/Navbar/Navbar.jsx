@@ -1,12 +1,12 @@
 import { useState, useEffect, useRef, useContext } from "react";
 import { useNavigate } from "react-router-dom";
-import { FiSearch, FiClock, FiX, FiBell, FiSun, FiMoon, FiMenu } from "react-icons/fi";
-import { logoutUser } from "../../services/authService.js";
+import { FiSearch, FiClock, FiX, FiBell, FiSun, FiMoon, FiMenu, FiSettings } from "react-icons/fi";
 import { getSearchHistory, addSearchHistory, deleteSearchHistory, clearSearchHistory } from "../../services/searchHistory.js";
 import {getAllVideos} from "../../services/videoService.js"
 import socket from "../../services/socketService.js";
 import { NotificationContext } from "../../context/NotificationContext.jsx";
 import {useTheme} from "../../context/ThemeContext.jsx";
+import {useAuth} from "../../context/AuthContext.jsx";
 
 const getTimeAgo = (date) => {
   const seconds = Math.floor(
@@ -42,9 +42,7 @@ function Navbar({onMenuClick}) {
   const navigate = useNavigate();
   const searchRef = useRef(null);
 
-  const [user, setUser] = useState(
-    JSON.parse(localStorage.getItem("user"))
-  );
+  const { user, logout, authLoading } = useAuth();
   const { darkMode, toggleTheme } = useTheme();
 
   const [search, setSearch] = useState("");
@@ -56,6 +54,10 @@ function Navbar({onMenuClick}) {
 
   const [showMenu, setShowMenu] = useState(false);
   const [avatarError, setAvatarError] = useState(false);
+
+  useEffect(() => {
+  setAvatarError(false);
+}, [user?.avatar]);
 
   useEffect(() => {
     const fetchSearchHistory = async () => {
@@ -228,19 +230,10 @@ const handleNotificationClick = async (notification) => {
   }
 };
 
- const handleLogout = async () => {
-  try {
-    await logoutUser();
-
-    localStorage.removeItem("user");
-
-    setUser(null);
-    setShowMenu(false);
-
-    navigate("/login");
-  } catch (err) {
-    console.error("Logout failed:", err);
-  }
+const handleLogout = async () => {
+  await logout();
+  setShowMenu(false);
+  navigate("/login");
 };
 
 const highlightMatch = (title) => {
@@ -526,8 +519,10 @@ const unreadCount = notifications.filter(
   {/* User */}
    <div className="relative">
 
-   {user ? (
-     <>
+   {authLoading ? (
+    <div className="w-10 h-10 rounded-full bg-gray-200 dark:bg-gray-700 animate-pulse" />
+  ) : user ? (
+    <>
     {/* Avatar */}
      <button
        onClick={() => setShowMenu(!showMenu)}
@@ -583,6 +578,18 @@ const unreadCount = notifications.filter(
   >
     My Videos
   </button>
+
+  {/* Settings */}
+<button
+  onClick={() => {
+    navigate("/settings");
+    setShowMenu(false);
+  }}
+  className="w-full text-left px-3 py-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800"
+>
+  <FiSettings className="inline mr-2" />
+  Settings
+</button>
 
  {/* Theme Toggle Button */}
   <button

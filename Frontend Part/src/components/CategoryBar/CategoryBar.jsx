@@ -7,6 +7,7 @@ const categories = [
   "Live",
   "AI",
   "News",
+  "Others",
 ];
 
 function CategoryBar({ selectedCategory, setSelectedCategory }) {

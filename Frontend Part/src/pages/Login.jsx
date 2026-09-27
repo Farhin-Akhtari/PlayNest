@@ -1,9 +1,11 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { loginUser } from "../services/authService";
+import { useAuth } from "../context/AuthContext.jsx";
 
 function Login() {
   const navigate = useNavigate();
+  const { login } = useAuth();
 
   const [formData, setFormData] = useState({
     username: "",
@@ -30,11 +32,7 @@ function Login() {
 
       const response = await loginUser(formData);
 
-      const user = response.data.user;
-
-      localStorage.setItem("user", JSON.stringify(user));
-      localStorage.setItem("accessToken", response.data.accessToken);
-      localStorage.setItem("refreshToken", response.data.refreshToken);
+      login(response);
 
       navigate("/");
     } catch (err) {

@@ -19,6 +19,11 @@ import WatchLater from "../pages/WatchLater";
 import Playlist from "../pages/Playlist";
 import PlaylistDetails from "../pages/PlaylistDetails";
 import Notifications from "../pages/Notification";
+import Settings from "../pages/Settings.jsx";
+import ProfileSettings from "../pages/ProfileSettings.jsx";
+import SecuritySettings from "../pages/SecuritySettings.jsx";
+import AppearanceSettings from "../pages/AppearanceSetting.jsx";
+import NotificationSettings from "../pages/NotificationSettings.jsx"; 
 
 function AppRoutes() {
   return (
@@ -33,6 +38,11 @@ function AppRoutes() {
           <Route path="/shorts" element={<Shorts />} />
           <Route path="/videos/:videoId" element={<VideoDetails/>} />
           <Route path="/notifications" element={<ProtectedRoute> <Notifications/> </ProtectedRoute>} />
+          <Route path="/settings" element={<ProtectedRoute> <Settings /> </ProtectedRoute>} />
+          <Route path="/settings/profile" element={<ProtectedRoute> <ProfileSettings /> </ProtectedRoute>} />
+          <Route path="/settings/security" element={<ProtectedRoute> <SecuritySettings /> </ProtectedRoute>} />
+          <Route path="/settings/appearance" element={<ProtectedRoute> <AppearanceSettings /> </ProtectedRoute>} />
+          <Route path="/settings/notifications" element={<ProtectedRoute> <NotificationSettings /> </ProtectedRoute>} />
           <Route path="/upload" element={ <ProtectedRoute> <UploadVideo/> </ProtectedRoute>} />
           <Route path="/my-videos" element={<ProtectedRoute> <MyVideos/> </ProtectedRoute>} />
           <Route path="/edit-video/:videoId" element={<ProtectedRoute> <EditVideo/> </ProtectedRoute>} />

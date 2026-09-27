@@ -22,17 +22,26 @@ const userSchema = new Schema({
     },
     fullName: {
         type: String,
-        required: true,
+        default: "",
         trim: true,
         index: true
     },
     avatar: {
         type: String,  //cloudinary url
-        required: true,
+        default: "",
+    },
+    avatarPublicId: {
+    type: String,
+    default: "",
     },
     coverImage: {
-        type: String
+        type: String,
+        default: ""
     },
+    coverImagePublicId: {
+    type: String,
+    default: "",
+   },
     watchHistory: [
         {
             type: Schema.Types.ObjectId,
@@ -51,7 +60,26 @@ const userSchema = new Schema({
     },
     refreshToken: {
         type: String
+    },
+    notificationPreferences: {
+    newSubscribers: {
+        type: Boolean,
+        default: true
+    },
+    likes: {
+        type: Boolean,
+        default: true
+    },
+    comments: {
+        type: Boolean,
+        default: true
+    },
+    replies: {
+        type: Boolean,
+        default: true
     }
+}
+
 },  {timestamps: true}
 )
 

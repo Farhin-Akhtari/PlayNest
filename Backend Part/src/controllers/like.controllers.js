@@ -64,7 +64,10 @@ const toggleVideoLike = asyncHandler(async (req, res) => {
     })
 
     if(video.owner.toString() !== req.user._id.toString()){
+     
+    const owner = await User.findById(video.owner).select("notificationPreferences");
 
+    if(owner?.notificationPreferences?.likes){
     const notification = await Notification.create({
     recipient: video.owner,
     sender: req.user._id,
@@ -85,6 +88,7 @@ const toggleVideoLike = asyncHandler(async (req, res) => {
             populatedNotification
         );
     }
+ }
 }
 
      return res

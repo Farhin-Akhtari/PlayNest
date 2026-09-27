@@ -80,6 +80,12 @@ const toggleSubscription = asyncHandler(async (req, res) => {
             throw new ApiError(500, "FAILED TO SUBSCRIBE")
         }
     }
+
+    const owner = await User.findById(channelId)
+    .select("notificationPreferences");
+
+    if(owner?.notificationPreferences?.newSubscribers){
+
    const existingNotification = await Notification.findOne({
     recipient: channelId,
     sender: req.user._id,
@@ -105,6 +111,7 @@ const toggleSubscription = asyncHandler(async (req, res) => {
         );
     }
   }
+}
 
     return res
     .status(200)

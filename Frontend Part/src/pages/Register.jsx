@@ -107,9 +107,9 @@ function Register() {
           className="w-full border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 p-3 rounded-lg mb-4"
         />
 
-        <label className="block text-gray-700 dark:text-gray-300 mb-2">
-          Avatar <span className="text-red-500">*</span>
-        </label>
+      <label className="block text-gray-700 dark:text-gray-300 mb-2">
+       Avatar <span className="text-gray-500 dark:text-gray-400">(Optional)</span>
+      </label>
 
         <input
           type="file"
@@ -119,7 +119,7 @@ function Register() {
         />
 
         <label className="block text-gray-700 dark:text-gray-300 mb-2">
-          Cover Image
+          Cover Image <span className="text-gray-500 dark:text-gray-400">(Optional)</span>
         </label>
 
         <input

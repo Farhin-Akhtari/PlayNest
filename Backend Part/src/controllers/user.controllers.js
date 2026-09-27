@@ -2,7 +2,7 @@ import { asyncHandler } from "../utils/asyncHandler.js";
 import {ApiError} from "../utils/ApiError.js"
 import {User} from "../models/user.models.js"
 import {Video} from "../models/video.models.js"
-import { uploadOnCloudinary } from "../utils/cloudinary.js";
+import { uploadOnCloudinary, deleteOnCloudinary } from "../utils/cloudinary.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import jwt from "jsonwebtoken";
 import mongoose, { isValidObjectId } from "mongoose";
@@ -45,9 +45,9 @@ console.log("FILES:", req.files);
   console.log("fullname: ", fullName)
    
 if(
-   [fullName, email, username, password].some((field) => field?.trim() === "")
+   [email, username, password].some((field) => field?.trim() === "")
 ){
-   throw new ApiError(400, "All fields are required")
+   throw new ApiError(400, "Email, username, and password are required")
 }
 
 const existedUser = await User.findOne({
@@ -59,23 +59,23 @@ if(existedUser){
 }
 console.log(req.files);
 
-const avatarLocalPath = req.files?.avatar[0]?.path
-const coverImageLocalPath = req.files?.coverImage[0]?.path
+const avatarLocalPath = req.files?.avatar?.[0]?.path;
+const coverImageLocalPath = req.files?.coverImage?.[0]?.path;
 
-if(!avatarLocalPath){
-   throw new ApiError(400, "Avatar files is required")
+let avatar = null;
+let coverImage = null;
+
+if (avatarLocalPath) {
+  avatar = await uploadOnCloudinary(avatarLocalPath);
 }
 
-const avatar = await uploadOnCloudinary(avatarLocalPath)
-const coverImage = await uploadOnCloudinary(coverImageLocalPath)
-
-if(!avatar){
-    throw new ApiError(400, "Avatar files is required")
+if (coverImageLocalPath) {
+  coverImage = await uploadOnCloudinary(coverImageLocalPath);
 }
 
 const user = await User.create({
-   fullName,
-   avatar: avatar.url,
+   fullName: fullName || "",
+   avatar: avatar?.url || "",
    coverImage: coverImage?.url || "",
    email,
    password,
@@ -244,8 +244,7 @@ const changeCurrentPassword = asyncHandler(async (req, res) => {
   }
 
   const user = await User.findById(req.user?._id)
-  user.isPasswordCorrect(oldPassword)
-  isPasswordCorrect(oldPassword)
+  const isPasswordCorrect = await user.isPasswordCorrect(oldPassword)
 
   if(!isPasswordCorrect){
    throw new ApiError(400, "Invalid old password")
@@ -307,7 +306,8 @@ const UpdateUserAvatar = asyncHandler(async (req, res) => {
    req.user?._id,
    {
       $set: {
-         avatar: avatar.url
+         avatar: avatar.url,
+         avatarPublicId: avatar.public_id,
       }
    },
    {new: true}
@@ -321,6 +321,29 @@ const UpdateUserAvatar = asyncHandler(async (req, res) => {
 
 })
 
+const RemoveUserAvatar = asyncHandler(async (req, res) => {
+  const user = await User.findById(req.user?._id);
+
+  if (!user) {
+    throw new ApiError(404, "User not found");
+  }
+
+  if (user.avatarPublicId) {
+    await deleteOnCloudinary(user.avatarPublicId);
+  }
+
+  user.avatar = "";
+  user.avatarPublicId = "";
+
+  await user.save();
+
+  return res
+    .status(200)
+    .json(
+      new ApiResponse(200, user, "Avatar removed successfully")
+    );
+});
+
 const UpdateUserCoverImage = asyncHandler(async (req, res) => {
   const coverImageLocalPath = req.file?.path
 
@@ -331,14 +354,15 @@ const UpdateUserCoverImage = asyncHandler(async (req, res) => {
   const coverImage = await uploadOnCloudinary(coverImageLocalPath)
 
   if(!coverImage.url){
-   throw new ApiError(400, "Error while uploading on avatar")
+   throw new ApiError(400, "Error while uploading on cover image")
   }
 
   const user = await User.findByIdAndUpdate(
    req.user?._id,
    {
       $set: {
-         coverImage: coverImage.url
+         coverImage: coverImage.url,
+         coverImagePublicId: coverImage.public_id,
       }
    },
    {new: true}
@@ -351,6 +375,29 @@ const UpdateUserCoverImage = asyncHandler(async (req, res) => {
   )
 
 })
+
+const RemoveUserCoverImage = asyncHandler(async (req, res) => {
+  const user = await User.findById(req.user?._id);
+
+  if (!user) {
+    throw new ApiError(404, "User not found");
+  }
+
+  if (user.coverImagePublicId) {
+    await deleteOnCloudinary(user.coverImagePublicId);
+  }
+
+  user.coverImage = "";
+  user.coverImagePublicId = "";
+
+  await user.save();
+
+  return res
+    .status(200)
+    .json(
+      new ApiResponse(200, user, "Cover image removed successfully")
+    );
+});
 
 const getUserChannelProfile = asyncHandler(async (req, res) => {
  const {username} = req.params
@@ -634,6 +681,65 @@ const toggleWatchLater = asyncHandler(async (req, res) => {
     );
 });
 
+const getNotificationPreferences = asyncHandler(async (req, res) => {
+   const user = await User.findById(req.user?._id)
+      .select("notificationPreferences");
+
+   if(!user){
+      throw new ApiError(404, "USER NOT FOUND");
+   }
+
+   return res
+      .status(200)
+      .json(
+         new ApiResponse(
+            200,
+            user.notificationPreferences,
+            "NOTIFICATION PREFERENCES FETCHED SUCCESSFULLY"
+         )
+      );
+});
+
+
+const updateNotificationPreferences = asyncHandler(async (req, res) => {
+   const {
+      newSubscribers,
+      likes,
+      comments,
+      replies
+   } = req.body;
+
+   const user = await User.findByIdAndUpdate(
+      req.user?._id,
+      {
+         $set: {
+            "notificationPreferences.newSubscribers": newSubscribers,
+            "notificationPreferences.likes": likes,
+            "notificationPreferences.comments": comments,
+            "notificationPreferences.replies": replies
+         }
+      },
+      {
+         new: true,
+         runValidators: true
+      }
+   ).select("notificationPreferences");
+
+   if(!user){
+      throw new ApiError(404, "USER NOT FOUND");
+   }
+
+   return res
+      .status(200)
+      .json(
+         new ApiResponse(
+            200,
+            user.notificationPreferences,
+            "NOTIFICATION PREFERENCES UPDATED SUCCESSFULLY"
+         )
+      );
+});
+
 
 export { registerUser, 
          loginUser,
@@ -643,10 +749,14 @@ export { registerUser,
          getCurrentUser,
          updateAccountDetails,
          UpdateUserAvatar,
+         RemoveUserAvatar,
          UpdateUserCoverImage,
+         RemoveUserCoverImage,
          getUserChannelProfile,
          getWatchHistory,
          getWatchLater,
          toggleWatchLater,
          removeFromWatchHistory,
+         getNotificationPreferences,
+         updateNotificationPreferences
        }

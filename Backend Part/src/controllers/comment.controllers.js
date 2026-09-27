@@ -129,6 +129,11 @@ const createComment = asyncHandler(async (req, res) => {
     //AUTHORIZATION 
     if(video.owner.toString() !== req.user._id.toString()){
 
+    const owner = await User.findById(video.owner)
+    .select("notificationPreferences");
+
+    if(owner?.notificationPreferences?.comments){
+
     // CREATE NOTIFICATION
   const notification = await Notification.create({
     recipient: video.owner,
@@ -159,8 +164,8 @@ const populatedNotification = await Notification.findById(notification._id)
         populatedNotification
     );
   }
+ }
 }
-
     const checkComment = await Comment.findById(comment._id)
     .populate("owner", "username fullName avatar");
 

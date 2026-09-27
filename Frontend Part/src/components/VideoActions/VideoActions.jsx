@@ -4,6 +4,7 @@ function VideoActions({
   liked,
   likesCount,
   onLike,
+  likeLoading,
   watchLater,
   onWatchLater,
   showLoginMessage,
@@ -16,6 +17,7 @@ function VideoActions({
 <div className="relative">
   <button
     onClick={onLike}
+    disabled={likeLoading}
     className={`px-4 py-2 rounded-full font-semibold transition-all duration-200 active:scale-95 ${
       liked
         ? "bg-black text-white hover:bg-gray-800 dark:bg-white dark:text-black dark:hover:bg-gray-200"

@@ -28,11 +28,13 @@ function VideoDetails() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
-  const [subscribed, setSubscribed] = useState(false);
-  const [subscribersCount, setSubscribersCount] = useState(0);
+ const [subscribed, setSubscribed] = useState(false);
+ const [subscribersCount, setSubscribersCount] = useState(0);
+ const [subscribeLoading, setSubscribeLoading] = useState(false);
 
-  const [liked, setLiked] = useState(false);
-  const [likesCount, setLikesCount] = useState(0);
+ const [liked, setLiked] = useState(false);
+ const [likesCount, setLikesCount] = useState(0);
+ const [likeLoading, setLikeLoading] = useState(false); 
 
   const [comments, setComments] = useState([]);
   const [commentsLoading, setCommentsLoading] = useState(true);
@@ -138,41 +140,83 @@ const handleSubscribe = async () => {
     return;
   }
 
-  try {
-    const response = await toggleSubscription(video.owner._id);
+  if (subscribeLoading) return;
 
-    const isNowSubscribed = response.data.subscribed;
+  const previousSubscribed = subscribed;
+  const previousCount = subscribersCount;
 
+  const newSubscribed = !subscribed;
+
+  // Update UI immediately
+  setSubscribed(newSubscribed);
+  setSubscribersCount((prev) =>
+    newSubscribed ? prev + 1 : Math.max(0, prev - 1)
+  );
+
+  setSubscribeLoading(true);
+
+ try {
+  const response = await toggleSubscription(video.owner._id);
+
+  const isNowSubscribed = response.data.subscribed;
+
+  if (isNowSubscribed !== newSubscribed) {
     setSubscribed(isNowSubscribed);
-
     setSubscribersCount((prev) =>
-      isNowSubscribed ? prev + 1 : prev - 1
+      isNowSubscribed ? prev + 1 : Math.max(0, prev - 1)
     );
-  } catch (err) {
-    console.error("Subscription failed:", err);
   }
+} catch (err) {
+  console.error("Subscription failed:", err);
+
+  setSubscribed(previousSubscribed);
+  setSubscribersCount(previousCount);
+} finally {
+  setSubscribeLoading(false);
+}
 };
 
   // ADD LIKE BUTTON HANDLER
- const handleLike = async () => {
+const handleLike = async () => {
   if (!loggedInUser) {
     showLoginRequired("Please log in to like this video.");
     return;
   }
 
-  try {
-    const response = await toggleVideoLike(videoId);
+  if (likeLoading) return;
 
-    const isNowLiked = response.data.liked;
+  const previousLiked = liked;
+  const previousCount = likesCount;
 
+  const newLiked = !liked;
+
+  // Update UI immediately
+  setLiked(newLiked);
+  setLikesCount((prev) =>
+    newLiked ? prev + 1 : Math.max(0, prev - 1)
+  );
+
+  setLikeLoading(true);
+
+   try {
+  const response = await toggleVideoLike(videoId);
+
+  const isNowLiked = response.data.liked;
+
+  if (isNowLiked !== newLiked) {
     setLiked(isNowLiked);
-
     setLikesCount((prev) =>
-      isNowLiked ? prev + 1 : prev - 1
+      isNowLiked ? prev + 1 : Math.max(0, prev - 1)
     );
-  } catch (err) {
-    console.error("Like failed:", err);
   }
+} catch (err) {
+  console.error("Like failed:", err);
+
+  setLiked(previousLiked);
+  setLikesCount(previousCount);
+} finally {
+  setLikeLoading(false);
+}
 };
 
   // ADD CREATE COMMENT HANDLER
@@ -364,7 +408,8 @@ const handleSubscribe = async () => {
         <div className="relative">
         <button
         onClick={handleSubscribe}
-         className={`px-5 py-2 rounded-full font-semibold transition-all duration-200 active:scale-95 ${
+         disabled={subscribeLoading}
+        className={`px-5 py-2 rounded-full font-semibold transition-all duration-200 ${
           subscribed
         ? "bg-gray-200 text-black hover:bg-gray-300 dark:bg-gray-800 dark:text-white dark:hover:bg-gray-700"
         : "bg-black text-white hover:bg-gray-800 dark:bg-white dark:text-black dark:hover:bg-gray-200"
@@ -382,15 +427,16 @@ const handleSubscribe = async () => {
       </div>
 
       {/* Video Actions */}
-      <VideoActions
-        liked={liked}
-        likesCount={likesCount}
-        onLike={handleLike}
-        watchLater={watchLater}
-        onWatchLater={handleWatchLater}
-        showLoginMessage={showLoginMessage}
-        loginMessage={loginMessage}
-      />
+ <VideoActions
+  liked={liked}
+  likesCount={likesCount}
+  onLike={handleLike}
+  likeLoading={likeLoading}
+  watchLater={watchLater}
+  onWatchLater={handleWatchLater}
+  showLoginMessage={showLoginMessage}
+  loginMessage={loginMessage}
+/>
       {/* Playlist Section */}
       <div className="relative mt-4">
         <button
