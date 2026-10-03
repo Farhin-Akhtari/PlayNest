@@ -2,10 +2,281 @@ import { asyncHandler } from "../utils/asyncHandler.js";
 import {ApiError} from "../utils/ApiError.js"
 import {User} from "../models/user.models.js"
 import {Video} from "../models/video.models.js"
+import {OAuthCode} from "../models/oauthCode.models.js"
 import { uploadOnCloudinary, deleteOnCloudinary } from "../utils/cloudinary.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import jwt from "jsonwebtoken";
 import mongoose, { isValidObjectId } from "mongoose";
+import crypto from "crypto";
+import googleClient from "../config/googleOAuth.js";
+
+const googleLogin = asyncHandler(async (req, res) => {
+    // Generate random state for CSRF protection
+    const state = crypto.randomBytes(32).toString("hex");
+
+    // Generate PKCE code verifier
+    const codeVerifier = crypto.randomBytes(32).toString("base64url");
+
+    // Generate PKCE code challenge
+    const codeChallenge = crypto
+        .createHash("sha256")
+        .update(codeVerifier)
+        .digest("base64url");
+
+    // Store state and code verifier temporarily
+    res.cookie("googleOAuthState", state, {
+        httpOnly: true,
+        secure: false,
+        sameSite: "lax",
+        maxAge: 10 * 60 * 1000
+    });
+
+    res.cookie("googleOAuthVerifier", codeVerifier, {
+        httpOnly: true,
+        secure: false,
+        sameSite: "lax",
+        maxAge: 10 * 60 * 1000
+    });
+
+    // Create Google authorization URL
+    const authorizationUrl = googleClient.generateAuthUrl({
+        access_type: "online",
+        scope: [
+            "openid",
+            "email",
+            "profile"
+        ],
+        state,
+        code_challenge: codeChallenge,
+        code_challenge_method: "S256",
+        prompt: "select_account"
+    });
+
+    return res.redirect(authorizationUrl);
+});
+
+const generateUniqueUsername = async (name, email) => {
+    let baseUsername = name
+        ? name.toLowerCase().replace(/[^a-z0-9]/g, "")
+        : email.split("@")[0].toLowerCase().replace(/[^a-z0-9]/g, "");
+
+    if (!baseUsername) {
+        baseUsername = "user";
+    }
+
+    let username = baseUsername;
+    let counter = 1;
+
+    while (await User.findOne({ username })) {
+        username = `${baseUsername}${counter}`;
+        counter++;
+    }
+
+    return username;
+};
+
+const hashOAuthCode = (code) => {
+    return crypto
+        .createHash("sha256")
+        .update(code)
+        .digest("hex");
+};
+
+const googleCallback = asyncHandler(async (req, res) => {
+    console.log("🔥 GOOGLE CALLBACK HIT");
+
+    const { code, state } = req.query;
+
+    console.log("1. code exists:", !!code);
+    console.log("2. state exists:", !!state);
+
+    if (!code) {
+        throw new ApiError(400, "Google authorization code is missing");
+    }
+
+    const savedState = req.cookies.googleOAuthState;
+
+    console.log("3. saved state exists:", !!savedState);
+    console.log("4. state matches:", state === savedState);
+
+    if (!state || !savedState || state !== savedState) {
+        throw new ApiError(400, "Invalid OAuth state");
+    }
+
+    console.log("5. State verified");
+
+    res.clearCookie("googleOAuthState", {
+        httpOnly: true,
+        secure: false,
+        sameSite: "lax"
+    });
+
+    const codeVerifier = req.cookies.googleOAuthVerifier;
+
+    console.log("6. PKCE verifier exists:", !!codeVerifier);
+
+    if (!codeVerifier) {
+        throw new ApiError(400, "Google PKCE verifier is missing");
+    }
+
+    res.clearCookie("googleOAuthVerifier", {
+        httpOnly: true,
+        secure: false,
+        sameSite: "lax"
+    });
+
+    console.log("7. About to exchange code with Google");
+
+    const { tokens } = await googleClient.getToken({
+        code,
+        codeVerifier
+    });
+
+    console.log("8. Google token exchange successful");
+
+    const ticket = await googleClient.verifyIdToken({
+        idToken: tokens.id_token,
+        audience: process.env.GOOGLE_CLIENT_ID
+    });
+
+    console.log("9. ID token verified");
+
+    const payload = ticket.getPayload();
+
+    const {
+        sub: googleId,
+        email,
+        name,
+        picture
+    } = payload;
+
+    console.log("10. Google user information received");
+
+    if (!googleId || !email) {
+        throw new ApiError(400, "Google account information is incomplete");
+    }
+
+    const normalizedEmail = email.toLowerCase().trim();
+
+    const existingGoogleUser = await User.findOne({ googleId });
+
+let user = existingGoogleUser;
+
+if (!user) {
+    console.log("New Google user");
+
+    const existingEmailUser = await User.findOne({ email: normalizedEmail });
+
+    if (existingEmailUser) {
+        throw new ApiError(
+            409,
+            "An account with this email already exists. Please log in with your existing account."
+        );
+    }
+
+    const username = await generateUniqueUsername(name, email);
+
+    user = await User.create({
+        username,
+        email: normalizedEmail,
+        googleId,
+        fullName: name || "",
+        avatar: picture || "",
+        password: ""
+    });
+
+    console.log("New Google user created:", user._id);
+} else {
+    console.log("Existing Google user found");
+}
+
+// Generate a one-time code for either user path
+const rawOAuthCode = crypto.randomBytes(32).toString("hex");
+const codeHash = hashOAuthCode(rawOAuthCode);
+
+console.log("OAuth raw code generated:", !!rawOAuthCode);
+console.log("OAuth code hash generated:", !!codeHash);
+
+await OAuthCode.create({
+    codeHash,
+    userId: user._id,
+    expiresAt: new Date(Date.now() + 2 * 60 * 1000)
+});
+console.log("OAuth code saved successfully");
+
+return res.redirect(
+    `${process.env.FRONTEND_URL}/oauth/callback?code=${rawOAuthCode}`
+);
+
+});
+
+const exchangeGoogleOAuthCode = asyncHandler(async (req, res) => {
+    const { code } = req.body;
+
+    if (!code) {
+        throw new ApiError(400, "OAuth code is required");
+    }
+
+    const codeHash = hashOAuthCode(code);
+
+    console.log("Exchange code received:", !!code);
+    console.log("Exchange hash generated:", !!codeHash);
+
+    const oauthCode = await OAuthCode.findOne({ codeHash });
+
+    console.log("OAuth code found:", !!oauthCode);
+
+    if (!oauthCode) {
+        throw new ApiError(400, "Invalid or expired OAuth code");
+    }
+
+    if (oauthCode.expiresAt < new Date()) {
+        await OAuthCode.deleteOne({ _id: oauthCode._id });
+
+        throw new ApiError(400, "OAuth code has expired");
+    }
+
+    const user = await User.findById(oauthCode.userId)
+        .select("-password -refreshToken");
+
+    if (!user) {
+        await OAuthCode.deleteOne({ _id: oauthCode._id });
+
+        throw new ApiError(404, "User not found");
+    }
+
+    // Delete immediately so the code can only be used once
+    await OAuthCode.deleteOne({ _id: oauthCode._id });
+
+    const { accessToken, refreshToken } =
+        await generateAccessAndRefreshTokens(user._id);
+
+    const loggedInUser = await User.findById(user._id)
+        .select("-password -refreshToken");
+
+    const options = {
+        httpOnly: true,
+        secure: false,
+        sameSite: "lax",
+        maxAge: 7 * 24 * 60 * 60 * 1000
+    };
+
+    return res
+        .status(200)
+        .cookie("accessToken", accessToken, options)
+        .cookie("refreshToken", refreshToken, options)
+        .json(
+            new ApiResponse(
+                200,
+                {
+                    user: loggedInUser,
+                    accessToken,
+                    refreshToken
+                },
+                "Google login successful"
+            )
+        );
+});
 
 const generateAccessAndRefreshTokens = async(userId) => {
    try {
@@ -14,7 +285,7 @@ const generateAccessAndRefreshTokens = async(userId) => {
       const refreshToken = user.generateRefreshToken()
 
       user.refreshToken = refreshToken
-      await user.save({vaidateBeforeSave: false})
+      await user.save({validateBeforeSave: false})
 
       return {accessToken, refreshToken}
 
@@ -758,5 +1029,9 @@ export { registerUser,
          toggleWatchLater,
          removeFromWatchHistory,
          getNotificationPreferences,
-         updateNotificationPreferences
+         updateNotificationPreferences,
+         googleLogin,
+         generateUniqueUsername,
+         googleCallback,
+         exchangeGoogleOAuthCode
        }

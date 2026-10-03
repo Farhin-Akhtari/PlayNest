@@ -4,9 +4,9 @@
   "description": "learn backend using project",
   "type": "module",
   "main": "index.js",
- "scripts": {
-  "dev": "nodemon -r dotenv/config --experimental-json-modules src/index.js",
-  "start": "node -r dotenv/config --experimental-json-modules src/index.js"
+  "scripts": {
+    "dev": "nodemon -r dotenv/config --experimental-json-modules src/index.js",
+    "start": "node -r dotenv/config --experimental-json-modules src/index.js"
   },
   "keywords": [
     "javascript",
@@ -25,6 +25,7 @@
     "cors": "^2.8.6",
     "dotenv": "^17.4.2",
     "express": "^5.2.1",
+    "google-auth-library": "^11.1.0",
     "jsonwebtoken": "^9.0.3",
     "mongoose": "^9.7.4",
     "mongoose-aggregate-paginate-v2": "^1.1.4",

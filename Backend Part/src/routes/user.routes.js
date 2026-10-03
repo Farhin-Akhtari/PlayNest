@@ -1,5 +1,26 @@
 import { Router } from "express";
-import { loginUser, logOutUser, registerUser, refreshAccessToken, changeCurrentPassword, getCurrentUser, updateAccountDetails, UpdateUserAvatar, UpdateUserCoverImage, getUserChannelProfile, getWatchHistory, getWatchLater, toggleWatchLater, removeFromWatchHistory, getNotificationPreferences, updateNotificationPreferences, RemoveUserAvatar, RemoveUserCoverImage } from "../controllers/user.controllers.js";
+import { loginUser,
+         logOutUser,
+         registerUser,
+        refreshAccessToken, 
+        changeCurrentPassword, 
+        getCurrentUser, 
+        updateAccountDetails, 
+        UpdateUserAvatar, 
+        UpdateUserCoverImage, 
+        getUserChannelProfile, 
+        getWatchHistory, 
+        getWatchLater, 
+        toggleWatchLater, 
+        removeFromWatchHistory,
+        getNotificationPreferences, 
+        updateNotificationPreferences, 
+        RemoveUserAvatar, 
+        RemoveUserCoverImage ,
+        googleLogin,
+        googleCallback,
+        exchangeGoogleOAuthCode,
+    } from "../controllers/user.controllers.js";
 import {upload} from "../middlewares/multer.middlewares.js"
 import { verifyJWT } from "../middlewares/auth.middlewares.js";
  
@@ -21,6 +42,9 @@ router.route("/register").post(
 )
 
 router.route("/login").post(loginUser)
+router.route("/google").get(googleLogin)
+router.route("/google/callback").get(googleCallback)
+router.route("/google/exchange").post(exchangeGoogleOAuthCode)
 //SECURED ROUTES
 router.route("/logout").post(logOutUser)
 router.route("/refresh-Token").post(refreshAccessToken)
