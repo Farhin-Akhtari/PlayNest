@@ -6,7 +6,7 @@ This repository contains the **frontend** of the PlayNest application. The front
 
 ## ✨ Features
 
-* 🔐 User authentication
+* 🔐 User authentication with JWT and Google OAuth 2.0
 * 🏠 Home page with video feed
 * 🔎 Video search with search suggestions
 * 🕘 Search history
@@ -75,13 +75,8 @@ The application contains separate pages for major user features, including:
 * Playlist Details
 * Subscriptions
 * Notifications
-
-### Context
-
-The application uses React Context for shared application state.
-
-* **NotificationContext** — Manages notification-related state
-* **ThemeContext** — Manages light and dark theme state
+* Settings
+* Shorts
 
 ### Services
 
@@ -89,7 +84,7 @@ The service layer handles communication between the frontend and backend APIs.
 
 Services include:
 
-* Authentication
+* Authentication and Google OAuth login
 * Videos
 * Comments
 * Likes
@@ -111,7 +106,7 @@ git clone https://github.com/Farhin-Akhtari/PlayNest.git
 ### 2. Navigate to the frontend folder
 
 ```bash
-cd Backend Part
+cd "Frontend Part"
 ```
 
 ### 3. Install dependencies
@@ -132,9 +127,9 @@ The frontend will then be available through the local Vite development server.
 
 The PlayNest frontend communicates with the PlayNest backend through REST APIs and Socket.IO.
 
-The backend is available in the backend folder of this repository.
+The backend is available in the Backend Part folder of this repository.
 
-See the Backend Part README for backend setup and API details.
+See the [Backend Part README](../Backend%20Part/README.md) for backend setup and API details.
 
 ## 🌙 Dark Mode
 
