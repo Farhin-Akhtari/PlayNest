@@ -74,3 +74,7 @@ export const updateNotificationPreferences = async (preferences) => {
   const response = await api.patch("/users/notification-preferences", preferences);
   return response.data;
 };
+
+export const googleLogin = () => {
+  window.location.href = `${import.meta.env.VITE_API_URL}/users/google`;
+};

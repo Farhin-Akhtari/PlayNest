@@ -24,6 +24,7 @@ import ProfileSettings from "../pages/ProfileSettings.jsx";
 import SecuritySettings from "../pages/SecuritySettings.jsx";
 import AppearanceSettings from "../pages/AppearanceSetting.jsx";
 import NotificationSettings from "../pages/NotificationSettings.jsx"; 
+import OAuthCallback from "../pages/OAuthCallback.jsx";
 
 function AppRoutes() {
   return (
@@ -32,6 +33,7 @@ function AppRoutes() {
         
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
+        <Route path="/oauth/callback" element={<OAuthCallback />} />
 
         <Route element={<MainLayout />}>
           <Route path="/" element={<Home />} />

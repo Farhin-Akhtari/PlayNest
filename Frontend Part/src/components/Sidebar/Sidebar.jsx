@@ -19,7 +19,12 @@ function Sidebar({ sidebarOpen, setSidebarOpen }) {
 
   const [activeMenu, setActiveMenu] = useState("Home");
 
-  const user = JSON.parse(localStorage.getItem("user"));
+  const storedUser = localStorage.getItem("user");
+
+const user =
+  storedUser && storedUser !== "undefined"
+    ? JSON.parse(storedUser)
+    : null;
 
   const mainMenuItems = [
     { name: "Home", icon: <MdHome />, path: "/" },

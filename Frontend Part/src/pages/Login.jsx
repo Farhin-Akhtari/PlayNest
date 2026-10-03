@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { loginUser } from "../services/authService";
+import { loginUser, googleLogin } from "../services/authService";
 import { useAuth } from "../context/AuthContext.jsx";
 
 function Login() {
@@ -96,6 +96,24 @@ function Login() {
         >
           {loading ? "Logging in..." : "Login"}
         </button>
+
+  <div className="flex items-center gap-3 my-5">
+   <div className="flex-1 border-t border-gray-300 dark:border-gray-700"></div>
+
+  <span className="text-sm text-gray-500 dark:text-gray-400">
+    OR
+  </span>
+
+  <div className="flex-1 border-t border-gray-300 dark:border-gray-700"></div>
+</div>
+
+<button
+  type="button"
+  onClick={googleLogin}
+  className="w-full border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white py-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition"
+>
+  Continue with Google
+</button>
 
     <p className="text-center mt-4 text-gray-600 dark:text-gray-400">
      Don't have an account?{" "}
