@@ -13,7 +13,9 @@ import { getSocketIO } from "../utils/socket.js";
 //Toggle video likes
 const toggleVideoLike = asyncHandler(async (req, res) => {
       console.log("🔥 TOGGLE VIDEO LIKE CONTROLLER HIT");
-    console.time("LIKE_TOTAL");
+      
+       const timerId = `LIKE_TOTAL_${Date.now()}`;
+        console.time(timerId);
     const {videoId} = req.params;
      if(!isValidObjectId(videoId)){
             throw new ApiError(400, "INVALID VIDEO ID");
@@ -95,7 +97,7 @@ const toggleVideoLike = asyncHandler(async (req, res) => {
     }
  }
 }
-    console.timeEnd("LIKE_TOTAL");
+    console.timeEnd(timerId);
      return res
      .status(200)
      .json(new ApiResponse(200, {liked: true}, "video liked successfully"));
