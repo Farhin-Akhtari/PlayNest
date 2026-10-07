@@ -12,6 +12,7 @@ import { getSocketIO } from "../utils/socket.js";
 
 //Toggle video likes
 const toggleVideoLike = asyncHandler(async (req, res) => {
+      console.log("🔥 TOGGLE VIDEO LIKE CONTROLLER HIT");
     console.time("LIKE_TOTAL");
     const {videoId} = req.params;
      if(!isValidObjectId(videoId)){
