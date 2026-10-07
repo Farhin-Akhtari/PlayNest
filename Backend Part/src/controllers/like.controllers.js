@@ -12,20 +12,23 @@ import { getSocketIO } from "../utils/socket.js";
 
 //Toggle video likes
 const toggleVideoLike = asyncHandler(async (req, res) => {
+    console.time("LIKE_TOTAL");
     const {videoId} = req.params;
      if(!isValidObjectId(videoId)){
             throw new ApiError(400, "INVALID VIDEO ID");
         }
-    
+    console.time("VIDEO_FIND");
     const video = await Video.findById(videoId);
+    console.timeEnd("VIDEO_FIND");
         if(!video){
             throw new ApiError(404, "VIDEO NOT FOUND");
         }
-
+    console.time("LIKE_FIND");
     const existingLike = await Like.findOne({
         video: videoId,
         likedBy: req.user._id
     })
+    console.timeEnd("LIKE_FIND");
 
     if(existingLike){
         await Like.findByIdAndDelete(existingLike._id);
@@ -57,11 +60,12 @@ const toggleVideoLike = asyncHandler(async (req, res) => {
         .status(200)
         .json(new ApiResponse(200, {liked: false}, "video unliked successfully"));
     }
-
+      console.time("LIKE_CREATE");
     const newLike = await Like.create({
          video: videoId,
         likedBy: req.user._id
     })
+    console.timeEnd("LIKE_CREATE");
 
     if(video.owner.toString() !== req.user._id.toString()){
      
@@ -90,7 +94,7 @@ const toggleVideoLike = asyncHandler(async (req, res) => {
     }
  }
 }
-
+    console.timeEnd("LIKE_TOTAL");
      return res
      .status(200)
      .json(new ApiResponse(200, {liked: true}, "video liked successfully"));
