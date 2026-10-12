@@ -94,18 +94,34 @@ const toggleVideoLike = asyncHandler(async (req, res) => {
     const io = getSocketIO();
 
     // Populate notification
-    console.time("NOTIFICATION_POPULATE");
-    const populatedNotification = await Notification.findById(notification._id)
-        .populate("sender", "username fullName avatar")
-        .populate("video", "title thumbnail")
-    console.timeEnd("NOTIFICATION_POPULATE");
+   
+const notificationPayload = {
+    _id: notification._id,
+    recipient: notification.recipient,
+    sender: {
+        _id: req.user._id,
+        username: req.user.username,
+        fullName: req.user.fullName,
+        avatar: req.user.avatar,
+    },
+    type: notification.type,
+    video: {
+        _id: video._id,
+        title: video.title,
+        thumbnail: video.thumbnail,
+    },
+    isRead: notification.isRead,
+    createdAt: notification.createdAt,
+    updatedAt: notification.updatedAt,
+};
 
-    if(io){
-        io.to(video.owner.toString()).emit(
-            "newNotification",
-            populatedNotification
-        );
-    }
+if (io) {
+    io.to(video.owner.toString()).emit(
+        "newNotification",
+        notificationPayload
+    );
+}
+
  }
 }
     console.timeEnd(timerId);
