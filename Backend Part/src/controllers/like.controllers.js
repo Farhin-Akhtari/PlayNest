@@ -37,6 +37,7 @@ const toggleVideoLike = asyncHandler(async (req, res) => {
         await Like.findByIdAndDelete(existingLike._id);
 
          // Find notification related to this like
+    console.time("NOTIFICATION_FIND");
     const notification = await Notification.findOne({
         recipient: video.owner,
         sender: req.user._id,
@@ -46,7 +47,11 @@ const toggleVideoLike = asyncHandler(async (req, res) => {
 
     // Delete the notification
     if(notification){
-        await Notification.findByIdAndDelete(notification._id);
+        console.time("NOTIFICATION_DELETE");
+
+    await Notification.findByIdAndDelete(notification._id);
+
+    console.timeEnd("NOTIFICATION_DELETE");
     }
 
     // Send real-time deletion
@@ -72,22 +77,28 @@ const toggleVideoLike = asyncHandler(async (req, res) => {
 
     if(video.owner.toString() !== req.user._id.toString()){
      
+    console.time("OWNER_FIND");
     const owner = await User.findById(video.owner).select("notificationPreferences");
+    console.timeEnd("OWNER_FIND");
 
     if(owner?.notificationPreferences?.likes){
+        console.time("NOTIFICATION_CREATE");
     const notification = await Notification.create({
     recipient: video.owner,
     sender: req.user._id,
     type: "like",
     video: videoId,
     });
+    console.timeEnd("NOTIFICATION_CREATE");
 
     const io = getSocketIO();
 
     // Populate notification
+    console.time("NOTIFICATION_POPULATE");
     const populatedNotification = await Notification.findById(notification._id)
         .populate("sender", "username fullName avatar")
         .populate("video", "title thumbnail")
+    console.timeEnd("NOTIFICATION_POPULATE");
 
     if(io){
         io.to(video.owner.toString()).emit(
