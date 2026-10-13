@@ -1,24 +1,32 @@
 //require('dotenv').config({path: './env'})
-import dotenv from "dotenv"
+import "dotenv/config";
 import connectDB from "./db/index.js";
 import { app } from "./app.js";
 import { createServer } from "http";
 import { Server } from "socket.io";
 import { setSocketIO } from "./utils/socket.js";
 
-
-dotenv.config({
-  path: './.env'
-})
+const allowedOrigins = (process.env.CORS_ORIGIN || "")
+  .split(",")
+  .map(origin => origin.trim())
+  .filter(Boolean);
 
 connectDB()
 .then(() => {
   const httpServer = createServer(app);
   const io = new Server(httpServer,  {
-  cors: {
-  origin: process.env.CORS_ORIGIN,
-  credentials: true,
+  
+cors: {
+  origin: (origin, callback) => {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error("Not allowed by CORS"));
+    }
   },
+  credentials: true,
+},
+
  });
 
   io.on("connection", (socket) => {
