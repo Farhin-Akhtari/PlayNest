@@ -43,6 +43,7 @@ function VideoDetails() {
   const [editingText, setEditingText] = useState("");
 
   const [watchLater, setWatchLater] = useState(false);
+  const [watchLaterMessage, setWatchLaterMessage] = useState("");
   const [playlists, setPlaylists] = useState([]);
   const [showPlaylistMenu, setShowPlaylistMenu] = useState(false);
   const [playlistMessage, setPlaylistMessage] = useState("");
@@ -322,54 +323,71 @@ const handleLike = async () => {
 
   // ADD TOGGLE WATCH LATER
   const handleWatchLater = async () => {
-    try {
-      const response = await toggleWatchLater(videoId);
+  try {
+    const response = await toggleWatchLater(videoId);
 
-      const isSaved = response.data.watchLater;
+    const isSaved = response.data.watchLater;
 
-      setWatchLater(isSaved);
-    } catch (err) {
-      console.error("Watch Later failed:", err);
-    }
-  };
+    setWatchLater(isSaved);
+
+    setWatchLaterMessage(
+      isSaved
+        ? "Video added to Watch Later successfully!"
+        : "Video removed from Watch Later successfully!"
+    );
+
+    setTimeout(() => {
+      setWatchLaterMessage("");
+    }, 3000);
+  } catch (err) {
+    console.error("Watch Later failed:", err);
+
+    setWatchLaterMessage(
+      err.response?.data?.message ||
+        "Failed to update Watch Later."
+    );
+
+    setTimeout(() => {
+      setWatchLaterMessage("");
+    }, 3000);
+  }
+};
 
   // ADD HANDLE PLAYLIST
-  const handleAddToPlaylist = async (playlistId) => {
-    try {
-      const response = await addVideoToPlaylist(
-        playlistId,
-        videoId
-      );
+const handleAddToPlaylist = async (playlistId) => {
+  try {
+    await addVideoToPlaylist(playlistId, videoId);
 
-      setPlaylistMessage(
-        "Video added to playlist successfully!"
-      );
-      setPlaylistMessageType("success");
+    // Update the selected playlist count immediately
+    setPlaylists((prev) =>
+      prev.map((playlist) =>
+        playlist._id === playlistId
+          ? {
+              ...playlist,
+              videoCount: (playlist.videoCount || 0) + 1,
+            }
+          : playlist
+      )
+    );
 
-      setShowPlaylistMenu(false);
+    setPlaylistMessage("Video added to playlist successfully!");
+    setPlaylistMessageType("success");
+  } catch (err) {
+    console.error("Failed to add video to playlist:", err);
 
-      setTimeout(() => {
-        setPlaylistMessage("");
-      }, 3000);
-    } catch (err) {
-      console.error(
-        "Failed to add video to playlist:",
-        err
-      );
+    setPlaylistMessage(
+      err.response?.data?.message ||
+        "Failed to add video to playlist"
+    );
+    setPlaylistMessageType("error");
+  } finally {
+    setShowPlaylistMenu(false);
 
-      setPlaylistMessage(
-        err.response?.data?.message ||
-          "Failed to add video to playlist"
-      );
-      setPlaylistMessageType("error");
-
-      setShowPlaylistMenu(false);
-
-      setTimeout(() => {
-        setPlaylistMessage("");
-      }, 3000);
-    }
-  };
+    setTimeout(() => {
+      setPlaylistMessage("");
+    }, 3000);
+  }
+};
 
   if (loading) {
     return (
@@ -434,6 +452,7 @@ const handleLike = async () => {
   likeLoading={likeLoading}
   watchLater={watchLater}
   onWatchLater={handleWatchLater}
+  watchLaterMessage={watchLaterMessage}
   showLoginMessage={showLoginMessage}
   loginMessage={loginMessage}
 />
@@ -441,7 +460,7 @@ const handleLike = async () => {
       <div className="relative mt-4">
         <button
           onClick={() => setShowPlaylistMenu(!showPlaylistMenu)}
-          className="px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-700 text-gray-900 dark:text-white font-medium hover:bg-gray-100 dark:hover:bg-gray-800 transition"
+           className="px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-700 text-gray-900 dark:text-white font-medium hover:bg-gray-100 dark:hover:bg-gray-800 transition-all duration-200 active:scale-95"
         >
           + Add to Playlist
         </button>
@@ -474,7 +493,10 @@ const handleLike = async () => {
               </div>
             )}
 
-            {playlistMessage && (
+          </div>
+        )}
+      </div>
+      {playlistMessage && (
               <p
                 className={`mt-3 text-sm ${
                   playlistMessageType === "success"
@@ -484,10 +506,7 @@ const handleLike = async () => {
               >
                 {playlistMessage}
               </p>
-            )}
-          </div>
-        )}
-      </div>
+      )}
 
       {/* Comment Section */}
       <div className="mt-8">

@@ -75,7 +75,8 @@ function Playlist() {
 
         <button
           onClick={() => setShowForm(!showForm)}
-          className="bg-black text-white dark:bg-white dark:text-black px-4 py-2 rounded-lg hover:bg-gray-800 dark:hover:bg-gray-200"
+          className="bg-black text-white dark:bg-white dark:text-black px-4 py-2 rounded-lg hover:bg-gray-800 dark:hover:bg-gray-200 transition-all duration-200 active:scale-95"
+
         >
           + Create Playlist
         </button>
@@ -110,7 +111,7 @@ function Playlist() {
 
           <button
             type="submit"
-            className="bg-black text-white dark:bg-white dark:text-black px-4 py-2 rounded-lg"
+            className="bg-black text-white dark:bg-white dark:text-black px-4 py-2 rounded-lg hover:bg-gray-800 dark:hover:bg-gray-200 transition-all duration-200 active:scale-95"
           >
             Create
           </button>

@@ -59,21 +59,33 @@ function Navbar({onMenuClick}) {
   setAvatarError(false);
 }, [user?.avatar]);
 
-  useEffect(() => {
-    const fetchSearchHistory = async () => {
-      if(!user){
-        return;
-      }
-      try {
-        const response = await getSearchHistory();
-        setSearchHistory(response.data);
-       
-      }catch(error){
-        console.error("Failed to fetch search history:", error);
-      }
-    };
-    fetchSearchHistory();
-  }, [user])
+ 
+useEffect(() => {
+  const fetchSearchHistory = async () => {
+
+    if (!user) {
+      console.log("No logged-in user; skipping search history.");
+      setSearchHistory([]);
+      return;
+    }
+
+    try {
+      const response = await getSearchHistory();
+
+      console.log("Search history API response:", response);
+
+      const history = Array.isArray(response)
+        ? response
+        : response?.data || [];
+
+      setSearchHistory(history);
+    } catch (error) {
+      console.error("Failed to fetch search history:", error);
+    }
+  };
+
+  fetchSearchHistory();
+}, [user]);
 
   useEffect(() => {
   const handleClickOutside = (event) => {
@@ -161,7 +173,11 @@ const handleSearch = async () => {
   try {
     const response = await addSearchHistory(trimmedSearch);
 
-    setSearchHistory((prev) => [response.data, ...prev]);
+    const newEntry = response.data || response;
+    setSearchHistory((prev) => [
+     newEntry,
+     ...prev.filter((item) => item._id !== newEntry._id),
+    ]);
 
     setShowSearchHistory(false);
 
@@ -280,7 +296,7 @@ const unreadCount = notifications.filter(
         {/* Search */}
        <div
   ref={searchRef}
-  className="relative order-3 w-full max-w-none md:order-none md:flex-1 md:min-w-0 md:max-w-[450px] mx-0 md:mx-0"
+  className="relative z-50 order-3 w-full max-w-none md:order-none md:flex-1 md:min-w-0 md:max-w-[450px] mx-0 md:mx-0"
 >
         <div className="flex items-center">
           <input
@@ -291,6 +307,7 @@ const unreadCount = notifications.filter(
             onChange={(e) => setSearch(e.target.value)}
             onKeyDown={(e) => {
              if (e.key === "Enter") {
+              console.log("ENTER PRESSED — calling handleSearch");
                handleSearch();
               }
             }}
@@ -314,14 +331,25 @@ const unreadCount = notifications.filter(
         {suggestions.slice(0, 5).map((video) => (
           <div
             key={video._id}
-            onClick={() => {
-              setSearch(video.title);
-              setShowSearchHistory(false);
+            
+onClick={async () => {
+  try {
+    const response = await addSearchHistory(video.title);
+    const newEntry = response.data || response;
 
-              navigate(
-                `/videos/${video._id}`
-              );
-            }}
+    setSearchHistory((prev) => [
+      newEntry,
+      ...prev.filter((item) => item.query !== video.title),
+    ]);
+  } catch (error) {
+    console.error("Failed to save suggested video search:", error);
+  }
+
+  setSearch(video.title);
+  setShowSearchHistory(false);
+  navigate(`/videos/${video._id}`);
+}}
+
            className="flex items-center gap-3 px-4 py-3 hover:bg-gray-100 dark:hover:bg-gray-800 cursor-pointer transition"
           >
             {/* Thumbnail */}

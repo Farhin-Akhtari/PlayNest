@@ -7,6 +7,7 @@ function VideoActions({
   likeLoading,
   watchLater,
   onWatchLater,
+  watchLaterMessage,
   showLoginMessage,
   loginMessage,
 }) {
@@ -34,21 +35,35 @@ function VideoActions({
   )}
 </div>
 
-      {/* Watch Later */}
-      <button
-        onClick={onWatchLater}
-        className={`flex items-center gap-2 px-4 py-2 rounded-full font-semibold transition ${
-          watchLater
-            ? "bg-black text-white dark:bg-white dark:text-black"
-            : "bg-gray-200 text-black dark:bg-gray-800 dark:text-white dark:hover:bg-gray-700"
-        }`}
-      >
-        <MdWatchLater className="text-xl" />
+     
+{/* Watch Later */}
+<div className="relative">
+  <button
+    onClick={onWatchLater}
+    className={`flex items-center gap-2 px-4 py-2 rounded-full font-semibold transition-all duration-200 active:scale-95 ${
+      watchLater
+        ? "bg-black text-white dark:bg-white dark:text-black"
+        : "bg-gray-200 text-black dark:bg-gray-800 dark:text-white dark:hover:bg-gray-700"
+    }`}
+  >
+    <MdWatchLater className="text-xl" />
+    {watchLater ? "Saved" : "Watch Later"}
+  </button>
 
-        {watchLater
-          ? "Saved"
-          : "Watch Later"}
-      </button>
+  {watchLaterMessage && (
+    <div
+      className={`absolute top-full left-0 mt-2 z-50 w-max max-w-xs rounded-xl border px-4 py-3 text-sm shadow-lg ${
+       watchLaterMessage.startsWith("Video removed") ||
+       watchLaterMessage.startsWith("Failed")
+          ? "border-red-200 bg-white text-red-600 dark:border-red-800 dark:bg-gray-900 dark:text-red-400"
+          : "border-gray-200 bg-white text-green-600 dark:border-gray-700 dark:bg-gray-900 dark:text-green-400"
+      }`}
+    >
+      {watchLaterMessage}
+    </div>
+  )}
+</div>
+
 
     </div>
   );

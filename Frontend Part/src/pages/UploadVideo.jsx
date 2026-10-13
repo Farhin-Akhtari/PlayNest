@@ -18,6 +18,7 @@ function UploadVideo() {
     "Live",
     "AI",
     "News",
+    "Others"
   ];
 
   const handleSubmit = async (e) => {
@@ -128,7 +129,7 @@ function UploadVideo() {
       {/* Publish */}
       <button
         type="submit"
-        className="w-full bg-black dark:bg-white text-white dark:text-black py-3 rounded-lg font-semibold hover:bg-gray-800 dark:hover:bg-gray-200 transition"
+         className="w-full bg-black dark:bg-white text-white dark:text-black py-3 rounded-lg font-semibold hover:bg-gray-800 dark:hover:bg-gray-200 transition-all duration-200 active:scale-95"
       >
         Publish Video
       </button>
