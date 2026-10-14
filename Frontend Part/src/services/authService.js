@@ -76,5 +76,8 @@ export const updateNotificationPreferences = async (preferences) => {
 };
 
 export const googleLogin = () => {
-  window.location.href = `${import.meta.env.VITE_API_URL}/users/google`;
+  const frontendOrigin = window.location.origin;
+
+  window.location.href =
+    `${import.meta.env.VITE_API_URL}/users/google?frontendOrigin=${encodeURIComponent(frontendOrigin)}`;
 };

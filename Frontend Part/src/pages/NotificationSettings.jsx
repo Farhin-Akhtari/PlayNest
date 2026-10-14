@@ -97,18 +97,18 @@ if (loading) {
             newSubscribers: !newSubscribers,
             likes,
             comments,
-           replies
+            replies
            })
           }
-            className={`relative w-12 h-6 rounded-full transition-colors ${
+            className={`relative shrink-0 w-12 h-6 rounded-full overflow-hidden transition-colors ${
               newSubscribers ? "bg-blue-600" : "bg-gray-300"
             }`}
             aria-label="Toggle new subscriber notifications"
           >
             <span
-              className={`absolute top-1 left-1 w-4 h-4 bg-white rounded-full transition-transform ${
-                newSubscribers ? "translate-x-6" : ""
-              }`}
+             className={`absolute top-1 left-1 w-4 h-4 bg-white rounded-full transition-transform duration-200 ${
+             newSubscribers ? "translate-x-6" : "translate-x-0"
+             }`}
             />
           </button>
         </div>
@@ -135,14 +135,14 @@ if (loading) {
               replies
             })
             }
-            className={`relative w-12 h-6 rounded-full transition-colors ${
+            className={`relative shrink-0 w-12 h-6 rounded-full overflow-hidden transition-colors ${
               likes ? "bg-blue-600" : "bg-gray-300"
             }`}
             aria-label="Toggle like notifications"
           >
             <span
-              className={`absolute top-1 left-1 w-4 h-4 bg-white rounded-full transition-transform ${
-                likes ? "translate-x-6" : ""
+              className={`absolute top-1 left-1 w-4 h-4 bg-white rounded-full transition-transform duration-200 ${
+                likes ? "translate-x-6" : "translate-x-0"
               }`}
             />
           </button>
@@ -170,14 +170,14 @@ if (loading) {
                 replies
               })
             }
-            className={`relative w-12 h-6 rounded-full transition-colors ${
+            className={`relative shrink-0 w-12 h-6 rounded-full overflow-hidden transition-colors ${
               comments ? "bg-blue-600" : "bg-gray-300"
             }`}
             aria-label="Toggle comment notifications"
           >
             <span
-              className={`absolute top-1 left-1 w-4 h-4 bg-white rounded-full transition-transform ${
-                comments ? "translate-x-6" : ""
+             className={`absolute top-1 left-1 w-4 h-4 bg-white rounded-full transition-transform duration-200 ${
+             comments ? "translate-x-6" : "translate-x-0"
               }`}
             />
           </button>
@@ -196,7 +196,6 @@ if (loading) {
           </div>
 
           <button
-            type="button"
             onClick={() =>
               savePreferences({
                 newSubscribers,
@@ -205,14 +204,14 @@ if (loading) {
                 replies: !replies
               })
             }
-            className={`relative w-12 h-6 rounded-full transition-colors ${
+            className={`relative shrink-0 w-12 h-6 rounded-full overflow-hidden transition-colors ${
               replies ? "bg-blue-600" : "bg-gray-300"
             }`}
             aria-label="Toggle reply notifications"
           >
             <span
-              className={`absolute top-1 left-1 w-4 h-4 bg-white rounded-full transition-transform ${
-                replies ? "translate-x-6" : ""
+             className={`absolute top-1 left-1 w-4 h-4 bg-white rounded-full transition-transform duration-200 ${
+             replies ? "translate-x-6" : "translate-x-0"
               }`}
             />
           </button>
