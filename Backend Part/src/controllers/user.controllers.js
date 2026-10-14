@@ -10,7 +10,20 @@ import mongoose, { isValidObjectId } from "mongoose";
 import crypto from "crypto";
 import googleClient from "../config/googleOAuth.js";
 
+const isProduction = process.env.NODE_ENV === "production";
+
 const googleLogin = asyncHandler(async (req, res) => {
+
+   const allowedOrigins = [
+    "http://localhost:5173",
+    "https://playnest-frontend.onrender.com"
+   ];
+ 
+   const frontendOrigin = req.query.frontendOrigin;
+
+   if (!allowedOrigins.includes(frontendOrigin)) {
+     throw new ApiError(400, "Invalid frontend origin");
+   }
     // Generate random state for CSRF protection
     const state = crypto.randomBytes(32).toString("hex");
 
@@ -26,16 +39,23 @@ const googleLogin = asyncHandler(async (req, res) => {
     // Store state and code verifier temporarily
     res.cookie("googleOAuthState", state, {
         httpOnly: true,
-        secure: false,
+        secure: isProduction,
         sameSite: "lax",
         maxAge: 10 * 60 * 1000
     });
 
     res.cookie("googleOAuthVerifier", codeVerifier, {
         httpOnly: true,
-        secure: false,
+        secure: isProduction,
         sameSite: "lax",
         maxAge: 10 * 60 * 1000
+    });
+
+     res.cookie("googleOAuthFrontendOrigin", frontendOrigin, {
+      httpOnly: true,
+      secure: isProduction,
+      sameSite: "lax",
+      maxAge: 10 * 60 * 1000
     });
 
     // Create Google authorization URL
@@ -103,11 +123,22 @@ const googleCallback = asyncHandler(async (req, res) => {
         throw new ApiError(400, "Invalid OAuth state");
     }
 
+    const frontendOrigin = req.cookies.googleOAuthFrontendOrigin;
+
+    const allowedOrigins = [
+    "http://localhost:5173",
+    "https://playnest-frontend.onrender.com"
+    ];
+
+   if (!allowedOrigins.includes(frontendOrigin)) {
+    throw new ApiError(400, "Invalid OAuth frontend origin");
+   }
+
     console.log("5. State verified");
 
     res.clearCookie("googleOAuthState", {
         httpOnly: true,
-        secure: false,
+        secure: isProduction,
         sameSite: "lax"
     });
 
@@ -121,9 +152,15 @@ const googleCallback = asyncHandler(async (req, res) => {
 
     res.clearCookie("googleOAuthVerifier", {
         httpOnly: true,
-        secure: false,
+        secure: isProduction,
         sameSite: "lax"
     });
+
+    res.clearCookie("googleOAuthFrontendOrigin", {
+    httpOnly: true,
+    secure: isProduction,
+    sameSite: "lax"
+   });
 
     console.log("7. About to exchange code with Google");
 
@@ -205,7 +242,7 @@ await OAuthCode.create({
 console.log("OAuth code saved successfully");
 
 return res.redirect(
-    `${process.env.FRONTEND_URL}/oauth/callback?code=${rawOAuthCode}`
+    `${frontendOrigin}/oauth/callback?code=${rawOAuthCode}`
 );
 
 });
@@ -256,7 +293,7 @@ const exchangeGoogleOAuthCode = asyncHandler(async (req, res) => {
 
     const options = {
         httpOnly: true,
-        secure: false,
+        secure: isProduction,
         sameSite: "lax",
         maxAge: 7 * 24 * 60 * 60 * 1000
     };
