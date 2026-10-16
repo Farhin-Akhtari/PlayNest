@@ -1,5 +1,3 @@
-# Backend series
-
 # 🎥 PlayNest — Backend
 
 The backend for **PlayNest**, a full-stack video-sharing platform inspired by modern video streaming platforms.
@@ -27,19 +25,16 @@ Built with **Node.js, Express.js, MongoDB, and Mongoose**, the backend provides 
 ---
 
 ### 🔐 Authentication & Authorization
-- User Registration
-- User Login & Logout
-- JWT Authentication
-- Refresh Token Support
-- Google OAuth 2.0 Login
-- OAuth 2.0 Authorization Code Flow
-- PKCE Verification
-- State Verification
-- Google ID Token Verification
-- Change Password
-- Update Account Details
-- Upload Avatar & Cover Image
-- Get Current User Profile
+* User registration, login, and logout
+* JWT authentication with access and refresh tokens
+* Google OAuth 2.0 login
+* OAuth 2.0 Authorization Code flow with PKCE
+* OAuth state verification
+* Google ID token verification
+* Change password and update account details
+* Avatar and cover image management
+* Current user profile retrieval
+* Protected API routes
 
 ---
 
@@ -47,49 +42,63 @@ Built with **Node.js, Express.js, MongoDB, and Mongoose**, the backend provides 
 
 PlayNest supports Google OAuth 2.0 login using Google's Authorization Code flow with PKCE and state verification.
 
-The authentication flow works as follows:
+Authentication flow
 
-1. The user selects Continue with Google from the PlayNest    login page.
-2. PlayNest redirects the user to Google's authorization page.
-3. Google authenticates the user and redirects back to the PlayNest backend callback.
-4. The backend verifies the OAuth state and PKCE verifier.
-5. The backend exchanges the authorization code with Google.
-6. The Google ID token is verified to obtain the user's Google identity.
-7. The backend finds the existing PlayNest account or creates a new account.
-8. PlayNest generates a temporary, single-use OAuth code.
-9. The frontend exchanges this temporary code with the backend.
-10. The backend generates PlayNest access and refresh tokens.
-11. The user is logged into PlayNest.
+1. The user selects Continue with Google on the PlayNest login page.
 
-Sensitive OAuth credentials such as the Google Client Secret are stored in environment variables and are not committed to the repository.
+2. The frontend sends its current origin to the backend.
+
+3. The backend validates the requested frontend origin against an allowlist and initiates Google authentication.
+
+4. Google authenticates the user and redirects to the backend callback.
+
+5. The backend validates the OAuth state and retrieves the PKCE code verifier.
+
+6. The backend exchanges the authorization code with Google and verifies the Google ID token.
+
+7. The backend finds the existing Google-linked PlayNest account or creates a new account.
+
+8. The backend generates a temporary, single-use OAuth code.
+
+9. The backend redirects the user to the appropriate frontend's OAuth callback.
+
+10. The frontend exchanges the temporary OAuth code with the backend.
+
+11. The backend validates and consumes the code, then issues PlayNest access and refresh tokens.
+
+# Supported frontend origins
+
+* Local development: http://localhost:5173
+* Production: https://playnest-frontend.onrender.com
+
+The backend uses HTTP-only cookies for OAuth flow data and configures secure cookies for production. OAuth state validation, PKCE, frontend-origin validation, and the short-lived, single-use code exchange help protect the authentication flow.
+
+Google OAuth credentials and other secrets must be stored in environment variables and must never be committed to the repository.
 
 ---
 
 ## 🔒 Security Features
 
-- JWT Authentication
-- Google OAuth 2.0
-- PKCE Verification
-- OAuth State Verification
-- Protected Routes
-- Owner Authorization
-- Input Validation
-- MongoDB ObjectId Validation
-- Secure Password Hashing
-- Refresh Token Mechanism
-- Single-use OAuth authorization code
+- JWT authentication and authorization
+- Access and refresh token mechanism
+- Google OAuth 2.0 authentication
+- PKCE verification and OAuth state validation
+- Google ID token verification
+- Single-use, short-lived OAuth authorization codes
+- Protected routes and owner-based authorization
+- Password hashing with bcrypt
+- Input and MongoDB ObjectId validation
 - Environment-based secret management
+- HTTP-only cookies for OAuth flow data
+- Secure OAuth state validation and PKCE verification
 
 ---
 
 ## 📡 API Features
 
 - RESTful API Design
-- Pagination
-- Searching
-- Sorting
-- Filtering
-- Aggregation
+- Pagination, Searching, Sorting,Filtering
+- MongoDB Aggregation
 - Consistent API Responses
 - Proper Error Handling
 
@@ -146,7 +155,7 @@ npm install
 
 ### 4. Configure environment variables
 
-Create a `.env` file using `.env.sample`.
+Create a `.env` file using `.env.sample` as a reference.
 
 ```env
 PORT=8000
@@ -177,6 +186,18 @@ FRONTEND_URL=http://localhost:5173
 ```bash
 npm run dev
 ```
+
+---
+
+## ☁️ Deployment
+
+PlayNest's backend is deployed on Render.
+
+Configure production environment variables in the Render dashboard. Set:
+
+NODE_ENV=production
+
+Use production URLs for the Google OAuth callback and the frontend CORS configuration. Never commit production credentials or .env files to Git.
 
 ---
 

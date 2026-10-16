@@ -97,6 +97,12 @@ Services include:
 
 ## 🚀 Getting Started
 
+# Prerequisites
+
+- Node.js and npm
+- Git
+- Access to a running PlayNest backend or the deployed backend API
+
 ### 1. Clone the repository
 
 ```bash
@@ -122,6 +128,19 @@ npm run dev
 ```
 
 The frontend will then be available through the local Vite development server.
+
+## 🔑 Authentication & Google OAuth
+
+PlayNest supports traditional authentication and Google OAuth 2.0.
+
+The frontend initiates Google sign-in through the backend and includes its current origin in the login request. After successful authentication, the backend redirects the user to the matching frontend.
+
+Supported frontend origins:
+
+- Local development: http://localhost:5173
+- Production: https://playnest-frontend.onrender.com
+
+The frontend then exchanges the temporary OAuth code with the backend to complete the login process.
 
 ## 🔗 Backend
 
