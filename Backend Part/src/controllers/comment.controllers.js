@@ -64,11 +64,11 @@ const getVideoComments = asyncHandler(async (req, res) => {
                 owner: {
                     $first: "$ownerDetails"
                 },
-                isLiked: {   
+                isLiked: req.user?._id ? {   
                     //$in already return true or false
                    $in: 
                    [new mongoose.Types.ObjectId(req.user?._id), "$likes.likedBy"],
-                },
+                } : false,
             }
         },
         {
